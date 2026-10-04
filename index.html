@@ -38,6 +38,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
     }
 
     .logo {
@@ -54,7 +56,7 @@
     .user-actions {
       display: flex;
       align-items: center;
-      gap: 1.5rem;
+      gap: 1rem;
     }
 
     .wallet-box {
@@ -63,11 +65,30 @@
       padding: 0.5rem 1rem;
       border-radius: 6px;
       font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
     }
 
     .wallet-amount {
       color: #28a745;
       font-weight: bold;
+    }
+
+    .btn-deposit {
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      padding: 0.35rem 0.75rem;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-deposit:hover {
+      background-color: #218838;
     }
 
     .btn-steam {
@@ -190,7 +211,7 @@
     }
 
     .progress-fill {
-      width: 0%; /* 6 de 8 slots */
+      width: 0%;
       height: 100%;
       background-color: var(--accent-orange);
     }
@@ -213,6 +234,119 @@
       background-color: #e05e00;
     }
 
+    /* Modal de Depósito */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+
+    .modal-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 450px;
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.75rem;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .close-modal:hover {
+      color: var(--text-main);
+    }
+
+    .modal-section-label {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .amount-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .btn-amount {
+      background-color: #101216;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.6rem;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-amount:hover, .btn-amount.active {
+      border-color: var(--accent-orange);
+      color: var(--accent-orange);
+      background-color: rgba(255, 107, 0, 0.1);
+    }
+
+    .payment-methods {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .method-option {
+      background-color: #101216;
+      border: 1px solid var(--border-color);
+      padding: 0.8rem 1rem;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: border 0.2s;
+    }
+
+    .method-option:hover {
+      border-color: var(--accent-blue);
+    }
+
+    .method-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
     /* Footer */
     footer {
       background-color: var(--card-bg);
@@ -232,7 +366,8 @@
     <div class="logo">CS2<span>DUEL</span></div>
     <div class="user-actions">
       <div class="wallet-box">
-        Saldo: <span class="wallet-amount">$0.00 USD</span>
+        <span>Saldo: <strong class="wallet-amount">$0.00 USD</strong></span>
+        <button class="btn-deposit" onclick="openModal()">+ Cargar</button>
       </div>
       <button class="btn-steam">
         🎮 Iniciar sesión con Steam
@@ -291,10 +426,63 @@
     </div>
   </main>
 
+  <!-- Modal Depósito -->
+  <div class="modal-overlay" id="depositModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Cargar Saldo</h3>
+        <button class="close-modal" onclick="closeModal()">&times;</button>
+      </div>
+
+      <span class="modal-section-label">1. Selecciona el monto:</span>
+      <div class="amount-grid">
+        <button class="btn-amount active">$5 USD</button>
+        <button class="btn-amount">$10 USD</button>
+        <button class="btn-amount">$20 USD</button>
+      </div>
+
+      <span class="modal-section-label">2. Selecciona el método de pago:</span>
+      <div class="payment-methods">
+        <div class="method-option">
+          <div class="method-info">
+            <span>💳</span> Mercado Pago / Transferencia
+          </div>
+          <span>&rsaquo;</span>
+        </div>
+        <div class="method-option">
+          <div class="method-info">
+            <span>🪙</span> Criptomonedas (USDT / Binance Pay)
+          </div>
+          <span>&rsaquo;</span>
+        </div>
+      </div>
+
+      <button class="btn-action" style="background-color: #28a745;">Continuar al Pago</button>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer>
     <p>&copy; CS2Duel. Todos los derechos reservados. No está afiliado a Valve Corporation.</p>
   </footer>
+
+  <script>
+    function openModal() {
+      document.getElementById('depositModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('depositModal').style.display = 'none';
+    }
+
+    // Cerrar modal al hacer clic fuera
+    window.onclick = function(event) {
+      const modal = document.getElementById('depositModal');
+      if (event.target === modal) {
+        closeModal();
+      }
+    }
+  </script>
 
 </body>
 </html>

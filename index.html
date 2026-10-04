@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CS2Duel - Torneos 1v1 Competitivos</title>
+  <style>
+    :root {
+      --bg-color: #0e1015;
+      --card-bg: #181b22;
+      --accent-orange: #ff6b00;
+      --accent-blue: #0088ff;
+      --text-main: #f0f2f5;
+      --text-muted: #8a93a0;
+      --border-color: #2a2e39;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Header / Navbar */
+    header {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: 1px;
+    }
+
+    .logo span {
+      color: var(--accent-orange);
+    }
+
+    .user-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .wallet-box {
+      background-color: #101216;
+      border: 1px solid var(--border-color);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
+
+    .wallet-amount {
+      color: #28a745;
+      font-weight: bold;
+    }
+
+    .btn-steam {
+      background-color: #171a21;
+      border: 1px solid #2a475e;
+      color: #c6d4df;
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-steam:hover {
+      background-color: #2a475e;
+      color: #fff;
+    }
+
+    /* Main Content */
+    main {
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid var(--accent-orange);
+      padding-left: 0.75rem;
+    }
+
+    /* Tournament Card */
+    .tournament-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, #1f232d 0%, #14171d 100%);
+      padding: 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .badge-mode {
+      background-color: rgba(255, 107, 0, 0.15);
+      color: var(--accent-orange);
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .card-body {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      flex: 1;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .stat-value {
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    .prize-highlight {
+      color: #28a745;
+      font-weight: bold;
+    }
+
+    .slots-bar-container {
+      margin-top: 0.5rem;
+    }
+
+    .slots-text {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      margin-bottom: 0.4rem;
+      color: var(--text-muted);
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background-color: #101216;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      width: 75%; /* 6 de 8 slots */
+      height: 100%;
+      background-color: var(--accent-orange);
+    }
+
+    .btn-action {
+      background-color: var(--accent-orange);
+      color: #fff;
+      border: none;
+      padding: 0.8rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      margin-top: auto;
+      transition: background 0.2s;
+    }
+
+    .btn-action:hover {
+      background-color: #e05e00;
+    }
+
+    /* Footer */
+    footer {
+      background-color: var(--card-bg);
+      border-top: 1px solid var(--border-color);
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo">CS2<span>DUEL</span></div>
+    <div class="user-actions">
+      <div class="wallet-box">
+        Saldo: <span class="wallet-amount">$0.00 USD</span>
+      </div>
+      <button class="btn-steam">
+        🎮 Iniciar sesión con Steam
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <h2 class="section-title">Torneos 1v1 Activos</h2>
+
+    <div class="tournament-grid">
+      
+      <!-- Card Torneo 1v1 -->
+      <div class="card">
+        <div class="card-header">
+          <span class="badge-mode">1v1 Loadout Libre</span>
+          <h3 class="card-title">Duelo de Titanes (Rifle + Pistola)</h3>
+        </div>
+        
+        <div class="card-body">
+          <div class="stat-row">
+            <span>Precio de Entrada:</span>
+            <span class="stat-value">$2.00 USD</span>
+          </div>
+          
+          <div class="stat-row">
+            <span>Pozo Total:</span>
+            <span class="stat-value prize-highlight">$16.00 USD</span>
+          </div>
+
+          <div class="stat-row">
+            <span>1.º Lugar:</span>
+            <span class="stat-value">$11.00 USD</span>
+          </div>
+
+          <div class="stat-row">
+            <span>2.º Lugar:</span>
+            <span class="stat-value">$3.00 USD</span>
+          </div>
+
+          <div class="slots-bar-container">
+            <div class="slots-text">
+              <span>Jugadores inscritos</span>
+              <span><strong>6</strong> / 8</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill"></div>
+            </div>
+          </div>
+
+          <button class="btn-action">Entrar al Torneo ($2.00 USD)</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; CS2Duel. Todos los derechos reservados. No está afiliado a Valve Corporation.</p>
+  </footer>
+
+</body>
+</html>

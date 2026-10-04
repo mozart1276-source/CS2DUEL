@@ -214,6 +214,7 @@
       width: 0%;
       height: 100%;
       background-color: var(--accent-orange);
+      transition: width 0.3s ease;
     }
 
     .btn-action {
@@ -232,6 +233,11 @@
 
     .btn-action:hover {
       background-color: #e05e00;
+    }
+
+    .btn-action:disabled {
+      background-color: #28a745;
+      cursor: default;
     }
 
     /* Modal de Depósito */
@@ -366,7 +372,7 @@
     <div class="logo">CS2<span>DUEL</span></div>
     <div class="user-actions">
       <div class="wallet-box">
-        <span>Saldo: <strong class="wallet-amount">$0.00 USD</strong></span>
+        <span>Saldo: <strong class="wallet-amount" id="userWallet">$0.00 USD</strong></span>
         <button class="btn-deposit" onclick="openModal()">+ Cargar</button>
       </div>
       <button class="btn-steam">
@@ -412,14 +418,14 @@
           <div class="slots-bar-container">
             <div class="slots-text">
               <span>Jugadores inscritos</span>
-              <span><strong>0</strong> / 8</span>
+              <span><strong id="slotsCount">0</strong> / 8</span>
             </div>
             <div class="progress-bar">
-              <div class="progress-fill"></div>
+              <div class="progress-fill" id="progressBar"></div>
             </div>
           </div>
 
-          <button class="btn-action">Entrar al Torneo ($2.00 USD)</button>
+          <button class="btn-action" id="joinBtn" onclick="joinTournament()">Entrar al Torneo ($2.00 USD)</button>
         </div>
       </div>
 
@@ -436,9 +442,9 @@
 
       <span class="modal-section-label">1. Selecciona el monto:</span>
       <div class="amount-grid">
-        <button class="btn-amount active">$5 USD</button>
-        <button class="btn-amount">$10 USD</button>
-        <button class="btn-amount">$20 USD</button>
+        <button class="btn-amount active" onclick="selectAmount(5, this)">$5 USD</button>
+        <button class="btn-amount" onclick="selectAmount(10, this)">$10 USD</button>
+        <button class="btn-amount" onclick="selectAmount(20, this)">$20 USD</button>
       </div>
 
       <span class="modal-section-label">2. Selecciona el método de pago:</span>
@@ -457,7 +463,7 @@
         </div>
       </div>
 
-      <button class="btn-action" style="background-color: #28a745;">Continuar al Pago</button>
+      <button class="btn-action" style="background-color: #28a745;" onclick="processDeposit()">Continuar al Pago</button>
     </div>
   </div>
 
@@ -467,12 +473,61 @@
   </footer>
 
   <script>
+    let currentWalletBalance = 0;
+    let selectedDepositAmount = 5;
+    let enrolledPlayers = 0;
+    let isEnrolled = false;
+
     function openModal() {
       document.getElementById('depositModal').style.display = 'flex';
     }
 
     function closeModal() {
       document.getElementById('depositModal').style.display = 'none';
+    }
+
+    function selectAmount(amount, buttonElement) {
+      selectedDepositAmount = amount;
+      document.querySelectorAll('.btn-amount').forEach(btn => btn.classList.remove('active'));
+      buttonElement.classList.add('active');
+    }
+
+    function processDeposit() {
+      currentWalletBalance += selectedDepositAmount;
+      document.getElementById('userWallet').innerText = `$${currentWalletBalance.toFixed(2)} USD`;
+      closeModal();
+      alert(`¡Carga exitosa! Has acreditado $${selectedDepositAmount}.00 USD en tu billetera de prueba.`);
+    }
+
+    function joinTournament() {
+      if (isEnrolled) return;
+
+      const entryFee = 2.00;
+
+      if (currentWalletBalance < entryFee) {
+        alert("Saldo insuficiente. Haz clic en '+ Cargar' para sumar fondos a tu billetera.");
+        openModal();
+        return;
+      }
+
+      // Restar entrada del saldo
+      currentWalletBalance -= entryFee;
+      document.getElementById('userWallet').innerText = `$${currentWalletBalance.toFixed(2)} USD`;
+
+      // Aumentar inscritos
+      enrolledPlayers += 1;
+      isEnrolled = true;
+
+      // Actualizar UI del torneo
+      document.getElementById('slotsCount').innerText = enrolledPlayers;
+      const progressPercent = (enrolledPlayers / 8) * 100;
+      document.getElementById('progressBar').style.width = `${progressPercent}%`;
+
+      const joinBtn = document.getElementById('joinBtn');
+      joinBtn.innerText = "✓ ¡Inscrito!";
+      joinBtn.disabled = true;
+
+      alert("¡Te has inscrito con éxito al Torneo 1v1!");
     }
 
     // Cerrar modal al hacer clic fuera

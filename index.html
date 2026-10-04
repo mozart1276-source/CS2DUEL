@@ -193,7 +193,6 @@
       text-transform: uppercase;
     }
 
-    .badge-live { background: rgba(255, 70, 85, 0.2); color: var(--accent); border: 1px solid var(--accent); }
     .badge-open { background: rgba(16, 185, 129, 0.2); color: var(--green); border: 1px solid var(--green); }
 
     .info-row {
@@ -269,7 +268,7 @@
             <span>Pozo de Premios</span>
             <span class="prize">$28.00 USD</span>
           </div>
-          <button class="btn" style="width:100%; margin-top:1rem;" onclick="joinTournament('1v1 Daily', 2.00)">Entrar al Torneo</button>
+          <button class="btn" style="width:100%; margin-top:1rem;" onclick="joinTournament(1, '1v1 Daily', 2.00)">Entrar al Torneo</button>
         </div>
       </div>
 
@@ -295,7 +294,7 @@
             <span>Pozo de Premios</span>
             <span class="prize">Skin AK-47 Redline</span>
           </div>
-          <button class="btn" style="width:100%; margin-top:1rem;" onclick="joinTournament('5v5 Weekly', 0.00)">Inscribir Equipo</button>
+          <button class="btn" style="width:100%; margin-top:1rem;" onclick="joinTournament(2, '5v5 Weekly', 0.00)">Inscribir Equipo</button>
         </div>
       </div>
     </div>
@@ -310,7 +309,7 @@
     const SUPABASE_KEY = 'sb_publishable_8kH5BwT9L2mP0xQ3vR7yW1zN6J4kL8mP';
     const STEAM_API_KEY = 'A8FB95590E950099A1AB114A97119B8E';
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let userState = {
       isLogged: false,
@@ -333,7 +332,7 @@
       window.location.href = steamOpenIdUrl;
     }
 
-    function checkSteamAuth() {
+    async function checkSteamAuth() {
       const urlParams = new URLSearchParams(window.location.search);
       const openidClaimed = urlParams.get('openid.claimed_id');
 
@@ -345,7 +344,35 @@
         userState.avatar = 'https://avatars.steamstatic.com/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_full.jpg';
         
         window.history.replaceState({}, document.title, window.location.pathname);
+
+        // Guardar o consultar usuario en Supabase
+        await saveUserToSupabase();
         updateUI();
+      }
+    }
+
+    async function saveUserToSupabase() {
+      if (!userState.steamId) return;
+
+      // Consultar si ya existe
+      const { data, error } = await _supabase
+        .from('profiles')
+        .select('*')
+        .eq('steam_id', userState.steamId)
+        .single();
+
+      if (data) {
+        userState.balance = parseFloat(data.wallet_balance);
+      } else {
+        // Crear usuario nuevo en la DB
+        await _supabase.from('profiles').insert([
+          {
+            steam_id: userState.steamId,
+            username: userState.name,
+            avatar_url: userState.avatar,
+            wallet_balance: userState.balance
+          }
+        ]);
       }
     }
 
@@ -367,17 +394,24 @@
       updateUI();
     }
 
-    function addFunds() {
+    async function addFunds() {
       if (!userState.isLogged) {
         alert('Tenés que iniciar sesión primero.');
         return;
       }
       userState.balance += 10.00;
+
+      // Actualizar en Supabase
+      await _supabase
+        .from('profiles')
+        .update({ wallet_balance: userState.balance })
+        .eq('steam_id', userState.steamId);
+
       updateUI();
-      alert('¡Simulación: Cargaste $10.00 USD con éxito!');
+      alert('¡Simulación: Cargaste $10.00 USD con éxito en la base de datos!');
     }
 
-    function joinTournament(name, fee) {
+    async function joinTournament(tournamentId, name, fee) {
       if (!userState.isLogged) {
         alert('Debes iniciar sesión con Steam para inscribirte.');
         return;
@@ -389,8 +423,20 @@
       }
 
       userState.balance -= fee;
+
+      // Descontar saldo en Supabase
+      await _supabase
+        .from('profiles')
+        .update({ wallet_balance: userState.balance })
+        .eq('steam_id', userState.steamId);
+
+      // Registrar la inscripción en la DB
+      await _supabase
+        .from('tournament_entries')
+        .insert([{ tournament_id: tournamentId, steam_id: userState.steamId }]);
+
       updateUI();
-      alert(`¡Te inscribiste con éxito al torneo: ${name}!`);
+      alert(`¡Te inscribiste con éxito al torneo: ${name}! La inscripción quedó guardada en Supabase.`);
     }
 
     window.onload = checkSteamAuth;

@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CS2Duel - Torneos 1v1 Competitivos</title>
+  
+  <!-- Librería de Supabase integrada -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     :root {
       --bg-color: #0e1015;
@@ -500,6 +504,14 @@
   </footer>
 
   <script>
+    // Configuración de credenciales
+    const SUPABASE_URL = 'https://gvisjhhhktpaycrhynzm.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_WlSbFUPECHovjDzWTgGmaw_wzONlUVO';
+    const STEAM_API_KEY = 'PEGA_ACA_TU_CLAVE_DE_STEAM';
+
+    // Inicializar conexión con Supabase
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
     let currentWalletBalance = 0;
     let selectedDepositAmount = 5;
     let enrolledPlayers = 0;
@@ -578,6 +590,5 @@
       }
     }
   </script>
-
 </body>
 </html>

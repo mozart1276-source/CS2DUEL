@@ -3,592 +3,397 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CS2Duel - Torneos 1v1 Competitivos</title>
-  
-  <!-- Librería de Supabase integrada -->
+  <title>Torneos de Counter-Strike 2 | 1v1 Aim & CS2 Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <style>
     :root {
-      --bg-color: #0e1015;
-      --card-bg: #181b22;
-      --accent-orange: #ff6b00;
-      --accent-blue: #0088ff;
-      --text-main: #f0f2f5;
-      --text-muted: #8a93a0;
-      --border-color: #2a2e39;
+      --bg: #0b0e14;
+      --surface: #151922;
+      --surface-light: #1e2430;
+      --accent: #ff4655;
+      --accent-hover: #ff5e6d;
+      --gold: #f59e0b;
+      --green: #10b981;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --border: rgba(255, 255, 255, 0.08);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Inter', sans-serif;
     }
 
     body {
-      background-color: var(--bg-color);
-      color: var(--text-main);
+      background-color: var(--bg);
+      color: var(--text);
       display: flex;
       flex-direction: column;
       min-height: 100vh;
     }
 
-    /* Header / Navbar */
     header {
-      background-color: var(--card-bg);
-      border-bottom: 1px solid var(--border-color);
+      background: rgba(21, 25, 34, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
       padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
     }
 
     .logo {
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: var(--text-main);
-      letter-spacing: 1px;
+      font-family: 'Teko', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #fff;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
-    .logo span {
-      color: var(--accent-orange);
-    }
+    .logo span { color: var(--accent); }
 
-    .user-actions {
+    .user-panel {
       display: flex;
       align-items: center;
       gap: 1rem;
     }
 
-    .wallet-box {
-      background-color: #101216;
-      border: 1px solid var(--border-color);
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      font-size: 0.95rem;
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-    }
-
-    .wallet-amount {
-      color: #28a745;
-      font-weight: bold;
-    }
-
-    .btn-deposit {
-      background-color: #28a745;
-      color: #fff;
+    .btn {
+      background: var(--accent);
+      color: white;
       border: none;
-      padding: 0.35rem 0.75rem;
-      border-radius: 4px;
-      font-weight: bold;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .btn-deposit:hover {
-      background-color: #218838;
-    }
-
-    .btn-steam {
-      background-color: #171a21;
-      border: 1px solid #2a475e;
-      color: #c6d4df;
       padding: 0.6rem 1.2rem;
-      border-radius: 6px;
       font-weight: 600;
+      border-radius: 6px;
       cursor: pointer;
-      display: flex;
+      transition: all 0.2s;
+      display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      transition: all 0.2s ease;
+      text-decoration: none;
+      font-size: 0.9rem;
     }
 
-    .btn-steam:hover {
-      background-color: #2a475e;
-      color: #fff;
+    .btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+
+    .btn-steam {
+      background: #171a21;
+      border: 1px solid #2a475e;
+      color: #c6d4df;
     }
 
-    .user-profile-badge {
+    .btn-steam:hover { background: #2a475e; color: #fff; }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-outline:hover { background: var(--surface-light); }
+
+    .user-profile {
       display: none;
       align-items: center;
-      gap: 0.6rem;
-      background-color: #101216;
-      border: 1px solid var(--border-color);
+      gap: 1rem;
+      background: var(--surface);
       padding: 0.4rem 0.8rem;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      font-weight: 600;
+      border-radius: 30px;
+      border: 1px solid var(--border);
     }
 
-    .avatar-img {
-      width: 28px;
-      height: 28px;
+    .user-avatar {
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
-      border: 1px solid var(--accent-orange);
     }
 
-    /* Main Content */
-    main {
-      flex: 1;
+    .wallet-badge {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--green);
+      padding: 0.3rem 0.6rem;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .container {
       max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
       width: 100%;
-      margin: 2rem auto;
-      padding: 0 1rem;
+      flex: 1;
     }
 
-    .section-title {
-      font-size: 1.5rem;
-      margin-bottom: 1.5rem;
-      border-left: 4px solid var(--accent-orange);
-      padding-left: 0.75rem;
+    .hero {
+      text-align: center;
+      padding: 3rem 1rem;
+      background: radial-gradient(circle at center, rgba(255, 70, 85, 0.15) 0%, rgba(11, 14, 20, 0) 70%);
+      margin-bottom: 2rem;
+      border-radius: 12px;
     }
 
-    /* Tournament Card */
-    .tournament-grid {
+    .hero h1 {
+      font-family: 'Teko', sans-serif;
+      font-size: 4rem;
+      line-height: 1;
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+
+    .hero p { color: var(--text-muted); font-size: 1.1rem; }
+
+    .tournaments-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 1.5rem;
     }
 
     .card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 10px;
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 70, 85, 0.4);
     }
 
     .card-header {
-      background: linear-gradient(135deg, #1f232d 0%, #14171d 100%);
-      padding: 1.25rem;
-      border-bottom: 1px solid var(--border-color);
+      padding: 1.2rem;
+      background: var(--surface-light);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .badge-mode {
-      background-color: rgba(255, 107, 0, 0.15);
-      color: var(--accent-orange);
-      padding: 0.25rem 0.6rem;
+    .card-body { padding: 1.2rem; }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
       border-radius: 4px;
-      font-size: 0.8rem;
-      font-weight: bold;
       text-transform: uppercase;
-      display: inline-block;
-      margin-bottom: 0.5rem;
     }
 
-    .card-title {
-      font-size: 1.2rem;
-      font-weight: 700;
-    }
+    .badge-live { background: rgba(255, 70, 85, 0.2); color: var(--accent); border: 1px solid var(--accent); }
+    .badge-open { background: rgba(16, 185, 129, 0.2); color: var(--green); border: 1px solid var(--green); }
 
-    .card-body {
-      padding: 1.25rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      flex: 1;
-    }
-
-    .stat-row {
+    .info-row {
       display: flex;
       justify-content: space-between;
-      font-size: 0.95rem;
-      color: var(--text-muted);
-    }
-
-    .stat-value {
-      color: var(--text-main);
-      font-weight: 600;
-    }
-
-    .prize-highlight {
-      color: #28a745;
-      font-weight: bold;
-    }
-
-    .slots-bar-container {
-      margin-top: 0.5rem;
-    }
-
-    .slots-text {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.85rem;
-      margin-bottom: 0.4rem;
-      color: var(--text-muted);
-    }
-
-    .progress-bar {
-      width: 100%;
-      height: 8px;
-      background-color: #101216;
-      border-radius: 4px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      width: 0%;
-      height: 100%;
-      background-color: var(--accent-orange);
-      transition: width 0.3s ease;
-    }
-
-    .btn-action {
-      background-color: var(--accent-orange);
-      color: #fff;
-      border: none;
-      padding: 0.8rem;
-      border-radius: 6px;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      width: 100%;
-      margin-top: auto;
-      transition: background 0.2s;
-    }
-
-    .btn-action:hover {
-      background-color: #e05e00;
-    }
-
-    .btn-action:disabled {
-      background-color: #28a745;
-      cursor: default;
-    }
-
-    /* Modal de Depósito */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.75);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      padding: 1rem;
-    }
-
-    .modal-card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      width: 100%;
-      max-width: 450px;
-      padding: 1.5rem;
-      position: relative;
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 0.75rem;
-    }
-
-    .modal-title {
-      font-size: 1.25rem;
-      font-weight: 700;
-    }
-
-    .close-modal {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-
-    .close-modal:hover {
-      color: var(--text-main);
-    }
-
-    .modal-section-label {
+      margin-bottom: 0.8rem;
       font-size: 0.9rem;
-      color: var(--text-muted);
-      margin-bottom: 0.5rem;
-      display: block;
     }
 
-    .amount-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.75rem;
-      margin-bottom: 1.25rem;
-    }
+    .info-row span:first-child { color: var(--text-muted); }
+    .info-row span:last-child { font-weight: 600; }
 
-    .btn-amount {
-      background-color: #101216;
-      border: 1px solid var(--border-color);
-      color: var(--text-main);
-      padding: 0.6rem;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+    .prize { color: var(--gold); font-size: 1.2rem; font-weight: 800; }
 
-    .btn-amount:hover, .btn-amount.active {
-      border-color: var(--accent-orange);
-      color: var(--accent-orange);
-      background-color: rgba(255, 107, 0, 0.1);
-    }
-
-    .payment-methods {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .method-option {
-      background-color: #101216;
-      border: 1px solid var(--border-color);
-      padding: 0.8rem 1rem;
-      border-radius: 6px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      transition: border 0.2s;
-    }
-
-    .method-option:hover {
-      border-color: var(--accent-blue);
-    }
-
-    .method-info {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-weight: 600;
-      font-size: 0.95rem;
-    }
-
-    /* Footer */
     footer {
-      background-color: var(--card-bg);
-      border-top: 1px solid var(--border-color);
       text-align: center;
-      padding: 1.5rem;
+      padding: 2rem;
+      border-top: 1px solid var(--border);
       color: var(--text-muted);
       font-size: 0.85rem;
-      margin-top: 3rem;
+      margin-top: auto;
     }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
   <header>
-    <div class="logo">CS2<span>DUEL</span></div>
-    <div class="user-actions">
-      <div class="wallet-box">
-        <span>Saldo: <strong class="wallet-amount" id="userWallet">$0.00 USD</strong></span>
-        <button class="btn-deposit" onclick="openModal()">+ Cargar</button>
+    <div class="logo">CS2<span>ARENA</span></div>
+    <div class="user-panel">
+      <div id="logged-out-view">
+        <button class="btn btn-steam" onclick="loginSteam()">
+          🎮 Iniciar Sesión con Steam
+        </button>
       </div>
-
-      <!-- Botón Steam (Antes de iniciar sesión) -->
-      <button class="btn-steam" id="steamBtn" onclick="loginWithSteam()">
-        🎮 Iniciar sesión con Steam
-      </button>
-
-      <!-- Perfil Steam (Luego de iniciar sesión) -->
-      <div class="user-profile-badge" id="userProfile">
-        <img src="https://avatars.steamstatic.com/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_full.jpg" alt="Avatar" class="avatar-img">
-        <span id="userName">Jugador_CS2</span>
+      <div id="logged-in-view" class="user-profile">
+        <img id="user-avatar" class="user-avatar" src="" alt="Avatar">
+        <span id="user-name" style="font-size:0.9rem; font-weight:600;"></span>
+        <div class="wallet-badge" id="user-wallet">$0.00 USD</div>
+        <button class="btn btn-outline" style="padding:0.3rem 0.6rem; font-size:0.75rem;" onclick="addFunds()">+ Cargar</button>
+        <button class="btn btn-outline" style="padding:0.3rem 0.6rem; font-size:0.75rem;" onclick="logout()">Salir</button>
       </div>
     </div>
   </header>
 
-  <!-- Main Content -->
-  <main>
-    <h2 class="section-title">Torneos 1v1 Activos</h2>
+  <div class="container">
+    <div class="hero">
+      <h1>COMPETÍ EN CS2 & GANÁ PREMIOS</h1>
+      <p>Torneos diarios 1v1 Aim Map y 5v5 con premios en dólares y skins.</p>
+    </div>
 
-    <div class="tournament-grid">
-      
-      <!-- Card Torneo 1v1 -->
+    <h2 style="margin-bottom: 1rem; font-family:'Teko'; font-size: 2rem; letter-spacing:1px;">TORNEOS DISPONIBLES</h2>
+
+    <div class="tournaments-grid">
       <div class="card">
         <div class="card-header">
-          <span class="badge-mode">1v1 Loadout Libre</span>
-          <h3 class="card-title">Duelo de Titanes (Rifle + Pistola)</h3>
+          <h3 style="font-size: 1.1rem;">1v1 Aim Map Daily #402</h3>
+          <span class="badge badge-open">Abierto</span>
         </div>
-        
         <div class="card-body">
-          <div class="stat-row">
-            <span>Precio de Entrada:</span>
-            <span class="stat-value">$2.00 USD</span>
+          <div class="info-row">
+            <span>Formato</span>
+            <span>1v1 Single Elimination</span>
           </div>
-          
-          <div class="stat-row">
-            <span>Pozo Total:</span>
-            <span class="stat-value prize-highlight">$16.00 USD</span>
+          <div class="info-row">
+            <span>Entrada</span>
+            <span>$2.00 USD</span>
           </div>
-
-          <div class="stat-row">
-            <span>1.º Lugar:</span>
-            <span class="stat-value">$11.00 USD</span>
+          <div class="info-row">
+            <span>Cupos</span>
+            <span>8 / 16 Jugadores</span>
           </div>
-
-          <div class="stat-row">
-            <span>2.º Lugar:</span>
-            <span class="stat-value">$3.00 USD</span>
+          <div class="info-row">
+            <span>Pozo de Premios</span>
+            <span class="prize">$28.00 USD</span>
           </div>
-
-          <div class="slots-bar-container">
-            <div class="slots-text">
-              <span>Jugadores inscritos</span>
-              <span><strong id="slotsCount">0</strong> / 8</span>
-            </div>
-            <div class="progress-bar">
-              <div class="progress-fill" id="progressBar"></div>
-            </div>
-          </div>
-
-          <button class="btn-action" id="joinBtn" onclick="joinTournament()">Entrar al Torneo ($2.00 USD)</button>
+          <button class="btn" style="width:100%; margin-top:1rem;" onclick="joinTournament('1v1 Daily', 2.00)">Entrar al Torneo</button>
         </div>
       </div>
 
-    </div>
-  </main>
-
-  <!-- Modal Depósito -->
-  <div class="modal-overlay" id="depositModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 class="modal-title">Cargar Saldo</h3>
-        <button class="close-modal" onclick="closeModal()">&times;</button>
-      </div>
-
-      <span class="modal-section-label">1. Selecciona el monto:</span>
-      <div class="amount-grid">
-        <button class="btn-amount active" onclick="selectAmount(5, this)">$5 USD</button>
-        <button class="btn-amount" onclick="selectAmount(10, this)">$10 USD</button>
-        <button class="btn-amount" onclick="selectAmount(20, this)">$20 USD</button>
-      </div>
-
-      <span class="modal-section-label">2. Selecciona el método de pago:</span>
-      <div class="payment-methods">
-        <div class="method-option">
-          <div class="method-info">
-            <span>💳</span> Mercado Pago / Transferencia
-          </div>
-          <span>&rsaquo;</span>
+      <div class="card">
+        <div class="card-header">
+          <h3 style="font-size: 1.1rem;">5v5 Competitive Weekly</h3>
+          <span class="badge badge-open">Inscripción</span>
         </div>
-        <div class="method-option">
-          <div class="method-info">
-            <span>🪙</span> Criptomonedas (USDT / Binance Pay)
+        <div class="card-body">
+          <div class="info-row">
+            <span>Formato</span>
+            <span>5v5 Best of 1</span>
           </div>
-          <span>&rsaquo;</span>
+          <div class="info-row">
+            <span>Entrada</span>
+            <span>Gratis</span>
+          </div>
+          <div class="info-row">
+            <span>Cupos</span>
+            <span>4 / 8 Equipos</span>
+          </div>
+          <div class="info-row">
+            <span>Pozo de Premios</span>
+            <span class="prize">Skin AK-47 Redline</span>
+          </div>
+          <button class="btn" style="width:100%; margin-top:1rem;" onclick="joinTournament('5v5 Weekly', 0.00)">Inscribir Equipo</button>
         </div>
       </div>
-
-      <button class="btn-action" style="background-color: #28a745;" onclick="processDeposit()">Continuar al Pago</button>
     </div>
   </div>
 
-  <!-- Footer -->
   <footer>
-    <p>&copy; CS2Duel. Todos los derechos reservados. No está afiliado a Valve Corporation.</p>
+    &copy; 2026 CS2 ARENA. No afiliado con Valve Corporation. Powered by Steam OpenID.
   </footer>
 
   <script>
-    // Configuración de credenciales
-    const SUPABASE_URL = 'https://gvisjhhhktpaycrhynzm.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_WlSbFUPECHovjDzWTgGmaw_wzONlUVO';
-    const STEAM_API_KEY = 'PEGA_ACA_TU_CLAVE_DE_STEAM';
+    const SUPABASE_URL = 'https://ynkghmgljmdilaznhyfe.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_8kH5BwT9L2mP0xQ3vR7yW1zN6J4kL8mP';
+    const STEAM_API_KEY = 'A8FB95590E950099A1AB114A97119B8E';
 
-    // Inicializar conexión con Supabase
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let currentWalletBalance = 0;
-    let selectedDepositAmount = 5;
-    let enrolledPlayers = 0;
-    let isEnrolled = false;
-    let isLoggedIn = false;
+    let userState = {
+      isLogged: false,
+      steamId: null,
+      name: '',
+      avatar: '',
+      balance: 10.00
+    };
 
-    function loginWithSteam() {
-      isLoggedIn = true;
-      document.getElementById('steamBtn').style.display = 'none';
-      document.getElementById('userProfile').style.display = 'flex';
-      alert("¡Sesión iniciada correctamente con tu cuenta de Steam!");
+    function loginSteam() {
+      const currentUrl = window.location.href.split('?')[0];
+      const steamOpenIdUrl = 'https://steamcommunity.com/openid/login' +
+        '?openid.ns=http://specs.openid.net/auth/2.0' +
+        '&openid.mode=checkid_setup' +
+        '&openid.return_to=' + encodeURIComponent(currentUrl) +
+        '&openid.realm=' + encodeURIComponent(window.location.origin) +
+        '&openid.identity=http://specs.openid.net/auth/2.0/identifier_select' +
+        '&openid.claimed_id=http://specs.openid.net/auth/2.0/identifier_select';
+      
+      window.location.href = steamOpenIdUrl;
     }
 
-    function openModal() {
-      document.getElementById('depositModal').style.display = 'flex';
+    function checkSteamAuth() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const openidClaimed = urlParams.get('openid.claimed_id');
+
+      if (openidClaimed) {
+        const steamId = openidClaimed.split('/').pop();
+        userState.isLogged = true;
+        userState.steamId = steamId;
+        userState.name = 'Jugador ' + steamId.substring(0, 5);
+        userState.avatar = 'https://avatars.steamstatic.com/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_full.jpg';
+        
+        window.history.replaceState({}, document.title, window.location.pathname);
+        updateUI();
+      }
     }
 
-    function closeModal() {
-      document.getElementById('depositModal').style.display = 'none';
+    function updateUI() {
+      if (userState.isLogged) {
+        document.getElementById('logged-out-view').style.display = 'none';
+        document.getElementById('logged-in-view').style.display = 'flex';
+        document.getElementById('user-name').innerText = userState.name;
+        document.getElementById('user-avatar').src = userState.avatar;
+        document.getElementById('user-wallet').innerText = `$${userState.balance.toFixed(2)} USD`;
+      } else {
+        document.getElementById('logged-out-view').style.display = 'block';
+        document.getElementById('logged-in-view').style.display = 'none';
+      }
     }
 
-    function selectAmount(amount, buttonElement) {
-      selectedDepositAmount = amount;
-      document.querySelectorAll('.btn-amount').forEach(btn => btn.classList.remove('active'));
-      buttonElement.classList.add('active');
+    function logout() {
+      userState.isLogged = false;
+      updateUI();
     }
 
-    function processDeposit() {
-      currentWalletBalance += selectedDepositAmount;
-      document.getElementById('userWallet').innerText = `$${currentWalletBalance.toFixed(2)} USD`;
-      closeModal();
-      alert(`¡Carga exitosa! Has acreditado $${selectedDepositAmount}.00 USD en tu billetera.`);
+    function addFunds() {
+      if (!userState.isLogged) {
+        alert('Tenés que iniciar sesión primero.');
+        return;
+      }
+      userState.balance += 10.00;
+      updateUI();
+      alert('¡Simulación: Cargaste $10.00 USD con éxito!');
     }
 
-    function joinTournament() {
-      if (!isLoggedIn) {
-        alert("Primero debes iniciar sesión con Steam para poder inscribirte a un torneo.");
+    function joinTournament(name, fee) {
+      if (!userState.isLogged) {
+        alert('Debes iniciar sesión con Steam para inscribirte.');
         return;
       }
 
-      if (isEnrolled) return;
-
-      const entryFee = 2.00;
-
-      if (currentWalletBalance < entryFee) {
-        alert("Saldo insuficiente. Haz clic en '+ Cargar' para sumar fondos a tu billetera.");
-        openModal();
+      if (userState.balance < fee) {
+        alert('Saldo insuficiente. Carga más fondos para entrar.');
         return;
       }
 
-      // Restar entrada del saldo
-      currentWalletBalance -= entryFee;
-      document.getElementById('userWallet').innerText = `$${currentWalletBalance.toFixed(2)} USD`;
-
-      // Aumentar inscritos
-      enrolledPlayers += 1;
-      isEnrolled = true;
-
-      // Actualizar UI del torneo
-      document.getElementById('slotsCount').innerText = enrolledPlayers;
-      const progressPercent = (enrolledPlayers / 8) * 100;
-      document.getElementById('progressBar').style.width = `${progressPercent}%`;
-
-      const joinBtn = document.getElementById('joinBtn');
-      joinBtn.innerText = "✓ ¡Inscrito!";
-      joinBtn.disabled = true;
-
-      alert("¡Te has inscrito con éxito al Torneo 1v1!");
+      userState.balance -= fee;
+      updateUI();
+      alert(`¡Te inscribiste con éxito al torneo: ${name}!`);
     }
 
-    // Cerrar modal al hacer clic fuera
-    window.onclick = function(event) {
-      const modal = document.getElementById('depositModal');
-      if (event.target === modal) {
-        closeModal();
-      }
-    }
+    window.onload = checkSteamAuth;
   </script>
 </body>
 </html>

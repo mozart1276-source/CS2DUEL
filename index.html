@@ -110,6 +110,25 @@
       color: #fff;
     }
 
+    .user-profile-badge {
+      display: none;
+      align-items: center;
+      gap: 0.6rem;
+      background-color: #101216;
+      border: 1px solid var(--border-color);
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .avatar-img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid var(--accent-orange);
+    }
+
     /* Main Content */
     main {
       flex: 1;
@@ -375,9 +394,17 @@
         <span>Saldo: <strong class="wallet-amount" id="userWallet">$0.00 USD</strong></span>
         <button class="btn-deposit" onclick="openModal()">+ Cargar</button>
       </div>
-      <button class="btn-steam">
+
+      <!-- Botón Steam (Antes de iniciar sesión) -->
+      <button class="btn-steam" id="steamBtn" onclick="loginWithSteam()">
         🎮 Iniciar sesión con Steam
       </button>
+
+      <!-- Perfil Steam (Luego de iniciar sesión) -->
+      <div class="user-profile-badge" id="userProfile">
+        <img src="https://avatars.steamstatic.com/fef49e7fa7e1997310d705b2a6158ff8dc1cdfeb_full.jpg" alt="Avatar" class="avatar-img">
+        <span id="userName">Jugador_CS2</span>
+      </div>
     </div>
   </header>
 
@@ -477,6 +504,14 @@
     let selectedDepositAmount = 5;
     let enrolledPlayers = 0;
     let isEnrolled = false;
+    let isLoggedIn = false;
+
+    function loginWithSteam() {
+      isLoggedIn = true;
+      document.getElementById('steamBtn').style.display = 'none';
+      document.getElementById('userProfile').style.display = 'flex';
+      alert("¡Sesión iniciada correctamente con tu cuenta de Steam!");
+    }
 
     function openModal() {
       document.getElementById('depositModal').style.display = 'flex';
@@ -496,10 +531,15 @@
       currentWalletBalance += selectedDepositAmount;
       document.getElementById('userWallet').innerText = `$${currentWalletBalance.toFixed(2)} USD`;
       closeModal();
-      alert(`¡Carga exitosa! Has acreditado $${selectedDepositAmount}.00 USD en tu billetera de prueba.`);
+      alert(`¡Carga exitosa! Has acreditado $${selectedDepositAmount}.00 USD en tu billetera.`);
     }
 
     function joinTournament() {
+      if (!isLoggedIn) {
+        alert("Primero debes iniciar sesión con Steam para poder inscribirte a un torneo.");
+        return;
+      }
+
       if (isEnrolled) return;
 
       const entryFee = 2.00;

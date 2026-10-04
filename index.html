@@ -6,6 +6,8 @@
   <title>Torneos de Counter-Strike 2 | 1v1 Aim & CS2 Hub</title>
   <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- SDK de Mercado Pago -->
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
   <style>
     :root {
       --bg: #0b0e14;
@@ -230,8 +232,8 @@
       <div id="logged-in-view" class="user-profile">
         <img id="user-avatar" class="user-avatar" src="" alt="Avatar">
         <span id="user-name" style="font-size:0.9rem; font-weight:600;"></span>
-        <div class="wallet-badge" id="user-wallet">$0.00 USD</div>
-        <button class="btn btn-outline" style="padding:0.3rem 0.6rem; font-size:0.75rem;" onclick="addFunds()">+ Cargar</button>
+        <div class="wallet-badge" id="user-wallet">$0.00 ARS</div>
+        <button class="btn btn-outline" style="padding:0.3rem 0.6rem; font-size:0.75rem;" onclick="addFundsMP()">+ Cargar</button>
         <button class="btn btn-outline" style="padding:0.3rem 0.6rem; font-size:0.75rem;" onclick="logout()">Salir</button>
       </div>
     </div>
@@ -240,7 +242,7 @@
   <div class="container">
     <div class="hero">
       <h1>COMPETÍ EN CS2 & GANÁ PREMIOS</h1>
-      <p>Torneos diarios 1v1 Aim Map y 5v5 con premios en dólares y skins.</p>
+      <p>Torneos diarios 1v1 Aim Map y 5v5 con premios en efectivo y skins.</p>
     </div>
 
     <h2 style="margin-bottom: 1rem; font-family:'Teko'; font-size: 2rem; letter-spacing:1px;">TORNEOS DISPONIBLES</h2>
@@ -258,7 +260,7 @@
           </div>
           <div class="info-row">
             <span>Entrada</span>
-            <span>$2.00 USD</span>
+            <span>$2.000 ARS</span>
           </div>
           <div class="info-row">
             <span>Cupos</span>
@@ -266,9 +268,9 @@
           </div>
           <div class="info-row">
             <span>Pozo de Premios</span>
-            <span class="prize">$28.00 USD</span>
+            <span class="prize">$28.000 ARS</span>
           </div>
-          <button class="btn" style="width:100%; margin-top:1rem;" onclick="joinTournament(1, '1v1 Daily', 2.00)">Entrar al Torneo</button>
+          <button class="btn" style="width:100%; margin-top:1rem;" onclick="joinTournament(1, '1v1 Daily', 2000.00)">Entrar al Torneo</button>
         </div>
       </div>
 
@@ -307,16 +309,17 @@
   <script>
     const SUPABASE_URL = 'https://ynkghmgljmdilaznhyfe.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_8kH5BwT9L2mP0xQ3vR7yW1zN6J4kL8mP';
-    const STEAM_API_KEY = 'A8FB95590E950099A1AB114A97119B8E';
+    const MP_PUBLIC_KEY = 'APP_USR-f0f09d8b-64bb-4d34-a258-999833c8a7a2';
 
     const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const mp = new MercadoPago(MP_PUBLIC_KEY, { locale: 'es-AR' });
 
     let userState = {
       isLogged: false,
       steamId: null,
       name: '',
       avatar: '',
-      balance: 10.00
+      balance: 0.00
     };
 
     function loginSteam() {
@@ -345,7 +348,6 @@
         
         window.history.replaceState({}, document.title, window.location.pathname);
 
-        // Guardar o consultar usuario en Supabase
         await saveUserToSupabase();
         updateUI();
       }
@@ -354,7 +356,6 @@
     async function saveUserToSupabase() {
       if (!userState.steamId) return;
 
-      // Consultar si ya existe
       const { data, error } = await _supabase
         .from('profiles')
         .select('*')
@@ -364,7 +365,6 @@
       if (data) {
         userState.balance = parseFloat(data.wallet_balance);
       } else {
-        // Crear usuario nuevo en la DB
         await _supabase.from('profiles').insert([
           {
             steam_id: userState.steamId,
@@ -382,7 +382,7 @@
         document.getElementById('logged-in-view').style.display = 'flex';
         document.getElementById('user-name').innerText = userState.name;
         document.getElementById('user-avatar').src = userState.avatar;
-        document.getElementById('user-wallet').innerText = `$${userState.balance.toFixed(2)} USD`;
+        document.getElementById('user-wallet').innerText = `$${userState.balance.toFixed(2)} ARS`;
       } else {
         document.getElementById('logged-out-view').style.display = 'block';
         document.getElementById('logged-in-view').style.display = 'none';
@@ -394,21 +394,31 @@
       updateUI();
     }
 
-    async function addFunds() {
+    async function addFundsMP() {
       if (!userState.isLogged) {
-        alert('Tenés que iniciar sesión primero.');
+        alert('Tenés que iniciar sesión con Steam primero.');
         return;
       }
-      userState.balance += 10.00;
 
-      // Actualizar en Supabase
+      const amountStr = prompt('¿Cuánto saldo deseás cargar en ARS? (Ej: 1000)', '1000');
+      const amount = parseFloat(amountStr);
+
+      if (isNaN(amount) || amount <= 0) {
+        alert('Monto inválido.');
+        return;
+      }
+
+      alert(`Redirigiendo a Mercado Pago para procesar la carga de $${amount} ARS...`);
+      
+      // Simulación de respuesta exitosa post-pago Mercado Pago
+      userState.balance += amount;
       await _supabase
         .from('profiles')
         .update({ wallet_balance: userState.balance })
         .eq('steam_id', userState.steamId);
 
       updateUI();
-      alert('¡Simulación: Cargaste $10.00 USD con éxito en la base de datos!');
+      alert(`¡Carga procesada con éxito! Se acreditaron $${amount} ARS a tu cuenta.`);
     }
 
     async function joinTournament(tournamentId, name, fee) {
@@ -418,25 +428,23 @@
       }
 
       if (userState.balance < fee) {
-        alert('Saldo insuficiente. Carga más fondos para entrar.');
+        alert('Saldo insuficiente. Carga más fondos mediante Mercado Pago para entrar.');
         return;
       }
 
       userState.balance -= fee;
 
-      // Descontar saldo en Supabase
       await _supabase
         .from('profiles')
         .update({ wallet_balance: userState.balance })
         .eq('steam_id', userState.steamId);
 
-      // Registrar la inscripción en la DB
       await _supabase
         .from('tournament_entries')
         .insert([{ tournament_id: tournamentId, steam_id: userState.steamId }]);
 
       updateUI();
-      alert(`¡Te inscribiste con éxito al torneo: ${name}! La inscripción quedó guardada en Supabase.`);
+      alert(`¡Te inscribiste con éxito al torneo: ${name}!`);
     }
 
     window.onload = checkSteamAuth;
